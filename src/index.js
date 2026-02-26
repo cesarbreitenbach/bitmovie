@@ -10,16 +10,13 @@ import Events from "./events/events.js";
 import { WorkerController } from "./controller/WorkerController.js";
 import { AppUIController } from "./controller/AppUIController.js";
 
-// 🔥 Services
 const userService = new UserService();
 const movieService = new MovieService();
 
-// 🔥 Views
 const userView = new UserView();
 const movieView = new MovieView();
 const modelView = new ModelView();
 
-// 🔥 Worker
 const mlWorker = new Worker("/src/workers/modelTrainingWorker.js", {
   type: "module",
 });
@@ -29,10 +26,8 @@ WorkerController.init({
   events: Events,
 });
 
-// ✅ UI overlay/toast/status
 AppUIController.init({ events: Events });
 
-// 🔥 Controllers
 ModelController.init({
   modelView,
   userService,

@@ -1,4 +1,3 @@
-// src/view/UserView.js
 import { View } from "./View.js";
 
 export class UserView extends View {
@@ -6,7 +5,6 @@ export class UserView extends View {
   #userAge = document.querySelector("#userAge");
   #saveBtn = document.querySelector("#saveUserBtn");
 
-  // ✅ histórico
   #historyList = document.querySelector("#pastPurchasesList");
   #ratedBadge = document.querySelector("#ratedCountBadge");
 
@@ -54,7 +52,6 @@ export class UserView extends View {
       });
     }
 
-    // filtros
     const bind = (btn, key) => {
       if (!btn) return;
       btn.addEventListener("click", () => this.#onFilterChange?.(key));
@@ -66,7 +63,6 @@ export class UserView extends View {
     bind(this.#filterWatchedBtn, "watched");
   }
 
-  // ✅ render da lista do histórico
   renderHistory(items = []) {
     if (this.#ratedBadge)
       this.#ratedBadge.textContent = `${items.length} avaliações`;
@@ -78,7 +74,6 @@ export class UserView extends View {
       return;
     }
 
-    // cards pequenos (2 por linha na sidebar)
     const html = items
       .map((m) => {
         const rating = Number(m.rating || 0);
@@ -98,7 +93,6 @@ export class UserView extends View {
     this.#historyList.innerHTML = html;
   }
 
-  // opcional: destacar botão ativo
   setActiveFilter(key) {
     const all = [
       this.#filterAllBtn,

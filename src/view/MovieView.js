@@ -16,13 +16,10 @@ export class MovieView extends View {
       "./src/view/templates/movie-card.html",
     );
 
-    // ✅ um único listener pra tudo (funciona com cards renderizados dinamicamente)
     this.attachDelegatedListeners();
   }
 
   onUserSelected(user) {
-    // se tiver usuário, liberamos interação (mas estrelas podem votar direto)
-    // aqui você escolhe: liberar tudo ou só depois do user
     this.setAllWatchButtonsDisabled(!user?.id);
   }
 

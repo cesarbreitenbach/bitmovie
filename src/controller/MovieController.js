@@ -4,7 +4,6 @@ export class MovieController {
   #events;
   #movieService;
 
-  // ✅ novas variáveis
   #allMovies = [];
   #recommendedMovies = [];
   #showingRecommendations = false;
@@ -29,12 +28,10 @@ export class MovieController {
     this.setupEventListeners();
     this.setupUIListeners();
 
-    // 🔥 Buscar filmes do backend
     this.#allMovies = await this.#movieService.getMovies();
 
-    // Render inicial (explorar)
     this.#showingRecommendations = false;
-    this.applySearchAndSort(); // render com filtro/ordem atuais
+    this.applySearchAndSort();
   }
 
   setupEventListeners() {
@@ -46,12 +43,10 @@ export class MovieController {
       this.applySearchAndSort();
     });
 
-    // Quando worker terminar re-ranking
     this.#events.onRecommendationsReady(({ recommendations }) => {
       this.#recommendedMovies = recommendations ?? [];
       this.#showingRecommendations = true;
 
-      // se quiser: setar sort para "recommended" automaticamente
       if (this.#sortEl) this.#sortEl.value = "recommended";
 
       this.applySearchAndSort();
@@ -81,7 +76,6 @@ export class MovieController {
   }
 
   getActiveList() {
-    // Se está mostrando recomendações e tem lista, usa ela; senão, catálogo.
     if (this.#showingRecommendations && this.#recommendedMovies.length) {
       return this.#recommendedMovies;
     }
@@ -89,25 +83,22 @@ export class MovieController {
   }
 
   normalizeTitle(movie) {
-    // seus filmes têm movie.title
     const t = movie?.title ?? movie?.name ?? "";
     return String(t).toLowerCase().trim();
   }
 
   getPopularityScore(movie) {
-    // tenta alguns campos comuns (TMDB etc.)
     const p =
       movie?.popularity ??
       movie?.vote_count ??
       movie?.voteCount ??
       movie?.vote_average ??
       movie?.voteAverage ??
-      movie?.score; // (se existir)
+      movie?.score;
     return Number(p) || 0;
   }
 
   getYearScore(movie) {
-    // tenta release_date (YYYY-MM-DD) / year / data
     const rd = movie?.release_date ?? movie?.releaseDate ?? movie?.year;
     if (!rd) return 0;
 
