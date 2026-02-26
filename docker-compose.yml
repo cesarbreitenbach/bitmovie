@@ -1,0 +1,26 @@
+# BitMovie 🎬🤖  
+Recomendador de filmes híbrido (pgvector + Rede Neural no navegador)
+
+Este repositório contém um projeto educacional que implementa um **pipeline híbrido de recomendação**:
+
+- **Backend (Node + Express + Postgres + pgvector)**  
+  - Armazena filmes e embeddings em **PostgreSQL com pgvector**
+  - Faz **retrieval vetorial** (busca dos ~200 candidatos mais próximos)
+  - Salva avaliações (rating) do usuário
+
+- **Frontend (JS no browser + Web Worker + TensorFlow.js)**  
+  - Faz **re-ranking** dos candidatos usando uma **rede neural simples por gêneros**
+  - Mostra gráficos do treino (tfjs-vis)
+  - Persiste o modelo treinado no navegador (IndexedDB)
+
+---
+
+## ✅ Requisitos
+
+### 1) Node.js
+- Node **18+** (recomendado 20+)
+
+Verifique:
+```bash
+node -v
+npm -v

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BitMovie • Recomendador de Filmes</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <!-- Topbar -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container-fluid px-3">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-film fs-4"></i>
+        <span class="navbar-brand mb-0 h1">BitMovie</span>
+        <span class="text-muted small d-none d-md-inline">Recomendador de filmes por IA</span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <span id="modelStatusBadge" class="badge text-bg-success">
+          <i class="bi bi-check2-circle me-1"></i> Modelo pronto
+        </span>
+        <span id="modelStatusText" class="text-muted small d-none d-md-inline">
+          Último treino: —
+        </span>
+
+        <button id="trainModelBtn" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-cpu me-1"></i> Treinar
+        </button>
+
+        <button disabled id="runRecommendationBtn" class="btn btn-primary btn-sm">
+          <i class="bi bi-magic me-1"></i> Recomendar
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container-fluid py-3">
+    <div class="row g-3">
+      <!-- Sidebar -->
+      <aside class="col-lg-3">
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Seu perfil</h5>
+
+            <form id="userForm">
+              <div class="mb-3">
+                <label for="userName" class="form-label">Nome</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" id="userName" placeholder="Digite seu nome">
+                </div>
+                <div class="form-text">Se o nome já existir, carregamos seu histórico automaticamente.</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="userAge" class="form-label">Idade</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-calendar3"></i></span>
+                  <input type="number" class="form-control" id="userAge" placeholder="Ex: 21" min="1" max="120">
+                </div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button id="saveUserBtn" type="button" class="btn btn-dark">
+                  <i class="bi bi-box-arrow-in-right me-1"></i> Entrar / Salvar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+              <h6 class="mb-0">Seu histórico</h6>
+              <span id="ratedCountBadge" class="badge text-bg-secondary">0 avaliações</span>
+            </div>
+
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <button class="btn btn-outline-secondary btn-sm" id="filterAllBtn">Tudo</button>
+              <button class="btn btn-outline-success btn-sm" id="filterLikedBtn">
+                <i class="bi bi-hand-thumbs-up me-1"></i> Curtidos
+              </button>
+              <button class="btn btn-outline-danger btn-sm" id="filterDislikedBtn">
+                <i class="bi bi-hand-thumbs-down me-1"></i> Não curtidos
+              </button>
+              <button class="btn btn-outline-primary btn-sm" id="filterWatchedBtn">
+                <i class="bi bi-check2 me-1"></i> Assistidos
+              </button>
+            </div>
+
+            <hr class="my-3">
+
+            <div id="pastMoviesContainer" class="history-scroll mt-3">
+              <div id="pastPurchasesList" class="row g-2"></div>
+            </div>
+         
+            
+          </div>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <section class="col-lg-9">
+        <!-- Search + chips -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input id="searchInput" type="text" class="form-control" placeholder="Buscar filme pelo título...">
+                </div>
+              </div>
+
+              <div class="col-md-6 d-flex gap-2 justify-content-md-end">
+                <select id="sortSelect" class="form-select" style="max-width: 220px;">
+                  <option value="recommended">Ordenar: Recomendados</option>
+                  <option value="popular">Ordenar: Populares</option>
+                  <option value="recent">Ordenar: Mais recentes</option>
+                  <option value="random">Ordenar: Aleatório</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-3 d-flex flex-wrap gap-2" id="genreChips">
+       
+        
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommended -->
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h4 class="mb-0">Recomendados para você</h4>
+          <span class="text-muted small" id="recommendationHint">Avalie alguns filmes para melhorar as recomendações.</span>
+        </div>
+
+        <div class="row g-3 mb-4" id="recommendedList">
+      
+        </div>
+
+        <!-- Explore -->
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h4 class="mb-0">Explorar</h4>
+          <span class="text-muted small" id="exploreHint">Marque como assistido e diga se curtiu ou não.</span>
+        </div>
+
+        <div class="row g-3" id="productList">
+        </div>
+
+        
+        <div class="card shadow-sm mt-4 d-none" id="adminDataPanel">
+          <div class="card-body">
+            <h6 id="purchasesDiv" style="cursor: pointer;" class="mb-2">
+              Dados (debug): avaliações de todos usuários
+              <i id="purchasesArrow" class="bi bi-chevron-down"></i>
+            </h6>
+            <div id="allUsersPurchasesList" class="overflow-auto" style="max-height: 300px; display: none;"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Training Overlay -->
+  <div id="trainingOverlay" class="training-overlay d-none">
+    <div class="training-card shadow">
+      <div class="d-flex align-items-center gap-3">
+        <div class="spinner-border" role="status" aria-label="Treinando"></div>
+        <div>
+          <div class="fw-semibold">Treinando recomendações…</div>
+          <div class="text-muted small" id="trainingSubtext">Isso leva alguns segundos.</div>
+        </div>
+      </div>
+
+      <div class="progress mt-3" role="progressbar" aria-label="Progresso do treino">
+        <div id="trainingProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="appToast" class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastText">Mensagem</div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module" src="./src/index.js"></script>
+</body>
+</html>
