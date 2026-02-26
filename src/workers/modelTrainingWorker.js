@@ -215,7 +215,6 @@ async function trainModel({ movies, users }) {
   console.log("Movies:", movies?.length);
   console.log("Users:", users?.length);
 
-  // ✅ teste de comunicação imediata (tem que aparecer no console do WorkerController)
   postMessage({
     type: workerEvents.progressUpdate,
     progress: { progress: 1, step: "start" },
